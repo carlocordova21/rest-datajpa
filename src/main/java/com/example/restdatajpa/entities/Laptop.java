@@ -1,16 +1,25 @@
 package com.example.restdatajpa.entities;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "laptops")
+@ApiModel(description = "Representa un laptop")
 public class Laptop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(notes = "Identificador del laptop")
     private Long id;
+    @ApiModelProperty(notes = "Marca del laptop")
     private String manufacturer;
+    @ApiModelProperty(notes = "Modelo del laptop")
     private String model;
+    @ApiModelProperty(notes = "Procesador del laptop")
     private String processor;
+    @ApiModelProperty(notes = "Memoria RAM del laptop")
     private Integer ram;
 
     public Laptop() {

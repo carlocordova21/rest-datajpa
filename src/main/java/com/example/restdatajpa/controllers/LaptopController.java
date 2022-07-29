@@ -2,6 +2,8 @@ package com.example.restdatajpa.controllers;
 
 import com.example.restdatajpa.entities.Laptop;
 import com.example.restdatajpa.repositories.LaptopRepository;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ public class LaptopController {
      * @return List<Laptop>
      */
     @GetMapping("/api/laptops")
+    @ApiOperation(value = "Lista todos los laptops", response = Laptop.class, responseContainer = "List")
     public List<Laptop> findAll() {
         //Recuperar todas las laptops de la base de datos
         return _laptopRepository.findAll();
@@ -36,6 +39,7 @@ public class LaptopController {
      * @return ResponseEntity<Laptop>
      */
     @GetMapping("/api/laptops/{id}")
+    @ApiOperation(value = "Busca un laptop por id", response = Laptop.class)
     public ResponseEntity<Laptop> findById(@PathVariable Long id) {
         //Recuperar una laptop por su id
         Optional<Laptop> optLaptop = _laptopRepository.findById(id);
@@ -52,6 +56,8 @@ public class LaptopController {
      * @return ResponseEntity<Laptop>
      */
     @PostMapping("/api/laptops")
+    @ApiOperation("Crea un nuevo laptop")
+    @ApiResponse(code = 400, message = "Bad Request")
     public ResponseEntity<Laptop> create(@RequestBody Laptop laptop) {
         if(laptop.getId() != null) {
             _logger.warn("Trying to create a laptop with an id");
@@ -71,6 +77,7 @@ public class LaptopController {
      * @return ResponseEntity<Laptop>
      */
     @PutMapping("api/laptops/{id}")
+    @ApiOperation("Actualiza un laptop")
     public ResponseEntity<Laptop> update(@RequestBody Laptop newLaptop, @PathVariable Long id) {
         if(newLaptop.getId() != null && !newLaptop.getId().equals(id)) {
             _logger.warn("Trying to update a laptop with an id different from the one in the path");
@@ -99,6 +106,7 @@ public class LaptopController {
      * @return ResponseEntity<Laptop>
      */
     @DeleteMapping("/api/laptops/{id}")
+    @ApiOperation("Elimina un laptop")
     public ResponseEntity<Laptop> delete(@PathVariable Long id) {
         //Eliminar una laptop
         Optional<Laptop> optLaptop = _laptopRepository.findById(id);
