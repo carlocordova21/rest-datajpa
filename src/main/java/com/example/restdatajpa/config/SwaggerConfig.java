@@ -8,9 +8,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.schema.WildcardType;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -44,6 +42,7 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
@@ -59,6 +58,16 @@ public class SwaggerConfig {
                 .securitySchemes(singletonList(apiKey()))
                 .securityContexts(singletonList(securityContext()))
                 .enableUrlTemplating(true);
+    }
+
+    private ApiInfo apiInfo() {
+        return new ApiInfo(
+                "API REST de la aplicación de ejemplo",
+                "CRUD de laptops",
+                "1.0",
+                "Terms of service",
+                new Contact("Carlo", "www.example.com", "example@gmail.com"),
+                "License of API", "API license URL", emptyList());
     }
 
     private final TypeResolver typeResolver;

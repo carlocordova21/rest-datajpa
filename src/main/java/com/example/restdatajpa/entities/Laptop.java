@@ -21,16 +21,19 @@ public class Laptop {
     private String processor;
     @ApiModelProperty(notes = "Memoria RAM del laptop")
     private Integer ram;
+    @ApiModelProperty(notes = "Precio del laptop")
+    private Double price;
 
     public Laptop() {
     }
 
-    public Laptop(Long id, String manufacturer, String model, String processor, Integer ram) {
+    public Laptop(Long id, String manufacturer, String model, String processor, Integer ram, Double price) {
         this.id = id;
         this.manufacturer = manufacturer;
         this.model = model;
         this.processor = processor;
         this.ram = ram;
+        this.price = price;
     }
 
     public Long getId() {
@@ -73,6 +76,14 @@ public class Laptop {
         this.ram = ram;
     }
 
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
     @Override
     public String toString() {
         return "Laptop{" +
@@ -81,6 +92,7 @@ public class Laptop {
                 ", model='" + model + '\'' +
                 ", processor='" + processor + '\'' +
                 ", ram=" + ram +
+                ", price=" + price +
                 '}';
     }
 }

@@ -17,8 +17,8 @@ public class RestDatajpaApplication {
 
 		//CRUD
 		//Store laptop
-		Laptop laptop1 = new Laptop(null, "Dell", "XPS 13", "Intel Core i7", 8);
-		Laptop laptop2 = new Laptop(null, "HP", "Pavilion", "Intel Core i7", 8);
+		Laptop laptop1 = new Laptop(null, "Dell", "XPS 13", "Intel Core i7", 8, 3599.99);
+		Laptop laptop2 = new Laptop(null, "HP", "Pavilion", "Intel Core i7", 8, 2999.99);
 		laptopRepository.save(laptop1);
 		laptopRepository.save(laptop2);
 	}

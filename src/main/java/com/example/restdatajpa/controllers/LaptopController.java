@@ -78,6 +78,7 @@ public class LaptopController {
      */
     @PutMapping("api/laptops/{id}")
     @ApiOperation("Actualiza un laptop")
+    @ApiResponse(code = 400, message = "Bad Request")
     public ResponseEntity<Laptop> update(@RequestBody Laptop newLaptop, @PathVariable Long id) {
         if(newLaptop.getId() != null && !newLaptop.getId().equals(id)) {
             _logger.warn("Trying to update a laptop with an id different from the one in the path");
@@ -94,6 +95,7 @@ public class LaptopController {
         laptopActualizado.setModel(newLaptop.getModel());
         laptopActualizado.setProcessor(newLaptop.getProcessor());
         laptopActualizado.setRam(newLaptop.getRam());
+        laptopActualizado.setPrice(newLaptop.getPrice());
 
         _logger.info("Updating laptop with id: " + laptopActualizado.getId());
         _laptopRepository.save(laptopActualizado);
@@ -107,6 +109,7 @@ public class LaptopController {
      */
     @DeleteMapping("/api/laptops/{id}")
     @ApiOperation("Elimina un laptop")
+    @ApiResponse(code = 204, message = "No Content")
     public ResponseEntity<Laptop> delete(@PathVariable Long id) {
         //Eliminar una laptop
         Optional<Laptop> optLaptop = _laptopRepository.findById(id);
@@ -116,6 +119,16 @@ public class LaptopController {
         }
         _logger.info("Deleting laptop with id: " + id);
         _laptopRepository.delete(optLaptop.get());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/api/laptops")
+    @ApiOperation("Elimina todos los laptops")
+    @ApiResponse(code = 204, message = "No Content")
+    public ResponseEntity<Laptop> deleteAll() {
+        //Eliminar todas las laptops
+        _logger.info("Deleting all laptops");
+        _laptopRepository.deleteAll();
         return ResponseEntity.noContent().build();
     }
 }
