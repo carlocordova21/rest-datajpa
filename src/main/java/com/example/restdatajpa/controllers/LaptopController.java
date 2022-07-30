@@ -122,6 +122,10 @@ public class LaptopController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * /api/laptops/{id}/delete
+     * @return ResponseEntity<Laptop>
+     */
     @DeleteMapping("/api/laptops")
     @ApiOperation("Elimina todos los laptops")
     @ApiResponse(code = 204, message = "No Content")
