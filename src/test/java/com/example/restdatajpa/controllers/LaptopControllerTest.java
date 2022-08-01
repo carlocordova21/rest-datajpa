@@ -80,9 +80,16 @@ class LaptopControllerTest {
         Map<String, String> params = new HashMap<>();
         params.put("id", String.valueOf(id));
 
-        ResponseEntity<Laptop> response = testRestTemplate.exchange(url, HttpMethod.PUT, request, Laptop.class, params);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals(404, response.getStatusCodeValue());
+        ResponseEntity<Laptop> responseFind = testRestTemplate.getForEntity(url, Laptop.class, params);
+        if (responseFind.getStatusCode() == HttpStatus.OK) {
+            ResponseEntity<Laptop> response = testRestTemplate.exchange(url, HttpMethod.PUT, request, Laptop.class, params);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(200, response.getStatusCodeValue());
+        } else {
+            assertEquals(HttpStatus.NOT_FOUND, responseFind.getStatusCode());
+            assertEquals(404, responseFind.getStatusCodeValue());
+        }
+
     }
 
     @Test
@@ -92,10 +99,15 @@ class LaptopControllerTest {
 
         Map<String, String> params = new HashMap<>();
         params.put("id", String.valueOf(id));
-
-        ResponseEntity<Laptop> response = testRestTemplate.exchange(url, HttpMethod.DELETE, null, Laptop.class, params);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals(404, response.getStatusCodeValue());
+        ResponseEntity<Laptop> responseFind = testRestTemplate.getForEntity(url, Laptop.class, params);
+        if (responseFind.getStatusCode() == HttpStatus.OK) {
+            ResponseEntity<Laptop> response = testRestTemplate.exchange(url, HttpMethod.DELETE, null, Laptop.class, params);
+            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+            assertEquals(204, response.getStatusCodeValue());
+        } else {
+            assertEquals(HttpStatus.NOT_FOUND, responseFind.getStatusCode());
+            assertEquals(404, responseFind.getStatusCodeValue());
+        }
     }
 
     @Test

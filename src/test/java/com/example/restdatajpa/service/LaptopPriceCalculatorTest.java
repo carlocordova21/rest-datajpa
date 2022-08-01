@@ -2,6 +2,7 @@ package com.example.restdatajpa.service;
 
 import com.example.restdatajpa.entities.Laptop;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 
 import static org.junit.jupiter.api.Assertions.*;
 
