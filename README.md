@@ -21,3 +21,7 @@ El acceso se puede realizar desde Postman o navegador.
    3. Crear una laptop
    4. Actualizar una laptop
    5. Eliminar una laptop
+
+## USUARIOS
+1. username: user, password: password
+2. username: admin, password: admin (Tiene acceso a swagger-ui)
