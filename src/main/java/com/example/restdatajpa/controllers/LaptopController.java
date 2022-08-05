@@ -1,36 +1,37 @@
 package com.example.restdatajpa.controllers;
 
+import com.example.restdatajpa.controllers.exceptions.RequestIdIsNotNullException;
 import com.example.restdatajpa.entities.Laptop;
-import com.example.restdatajpa.repositories.LaptopRepository;
+import com.example.restdatajpa.service.LaptopService;
+import com.example.restdatajpa.service.LaptopServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
+@RequestMapping("/api/laptops")
 public class LaptopController {
-    private final LaptopRepository _laptopRepository;
+    @Autowired
+    private LaptopService _laptopService;
     private final Logger _logger = LoggerFactory.getLogger(LaptopController.class);
-
-    public LaptopController(LaptopRepository _laptopRepository) {
-        this._laptopRepository = _laptopRepository;
-    }
 
     /**
      * /api/laptops
      * @return List<Laptop>
      */
-    @GetMapping("/api/laptops")
+    @GetMapping
     @ApiOperation(value = "Lista todos los laptops", response = Laptop.class, responseContainer = "List")
     public List<Laptop> findAll() {
         //Recuperar todas las laptops de la base de datos
-        return _laptopRepository.findAll();
+        return _laptopService.findAll();
     }
 
     /**
@@ -38,16 +39,12 @@ public class LaptopController {
      * @param id Long
      * @return ResponseEntity<Laptop>
      */
-    @GetMapping("/api/laptops/{id}")
+    @GetMapping("/{id}")
     @ApiOperation(value = "Busca un laptop por id", response = Laptop.class)
     public ResponseEntity<Laptop> findById(@PathVariable Long id) {
         //Recuperar una laptop por su id
-        Optional<Laptop> optLaptop = _laptopRepository.findById(id);
-        if (optLaptop.isEmpty()){
-            _logger.warn("Laptop con id {} no encontrado", id);
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(optLaptop.get());
+        Laptop laptop = _laptopService.findById(id);
+        return ResponseEntity.ok(laptop);
     }
 
     /**
@@ -55,19 +52,21 @@ public class LaptopController {
      * @param laptop Laptop
      * @return ResponseEntity<Laptop>
      */
-    @PostMapping("/api/laptops")
+    @PostMapping
+    @Transactional
     @ApiOperation("Crea un nuevo laptop")
     @ApiResponse(code = 400, message = "Bad Request")
     public ResponseEntity<Laptop> create(@RequestBody Laptop laptop) {
         if(laptop.getId() != null) {
-            _logger.warn("Trying to create a laptop with an id");
-            return ResponseEntity.badRequest().build();
+            String errorMessage = "Trying to create a laptop with an id " + laptop.getId();
+            _logger.warn(errorMessage);
+            throw new RequestIdIsNotNullException(errorMessage);
         }
         //Crear una laptop
         _logger.info("Creating laptop: {}", laptop);
-        Laptop laptopCreado = _laptopRepository.save(laptop);
-        URI location = URI.create("/api/laptops/" + laptopCreado.getId());
-        return ResponseEntity.created(location).body(laptopCreado);
+        Laptop newLaptop = _laptopService.create(laptop);
+        URI location = URI.create("/api/laptops/" + newLaptop.getId());
+        return ResponseEntity.created(location).body(newLaptop);
     }
 
     /**
@@ -76,29 +75,18 @@ public class LaptopController {
      * @param id Long
      * @return ResponseEntity<Laptop>
      */
-    @PutMapping("api/laptops/{id}")
+    @PutMapping("/{id}")
+    @Transactional
     @ApiOperation("Actualiza un laptop")
     @ApiResponse(code = 400, message = "Bad Request")
     public ResponseEntity<Laptop> update(@RequestBody Laptop newLaptop, @PathVariable Long id) {
-        if(newLaptop.getId() != null && !newLaptop.getId().equals(id)) {
+        if(newLaptop.getId() != null) {
             _logger.warn("Trying to update a laptop with an id different from the one in the path");
-            return ResponseEntity.badRequest().build();
+            throw new RequestIdIsNotNullException("Id is not null " + newLaptop.getId());
         }
-        Optional<Laptop> optLaptop = _laptopRepository.findById(id);
-        if (optLaptop.isEmpty()) {
-            _logger.warn("Trying to update a laptop that does not exist");
-            return ResponseEntity.notFound().build();
-        }
+        Laptop laptopActualizado = _laptopService.update(newLaptop, id);
         //Actualizar una laptop
-        Laptop laptopActualizado = optLaptop.get();
-        laptopActualizado.setManufacturer(newLaptop.getManufacturer());
-        laptopActualizado.setModel(newLaptop.getModel());
-        laptopActualizado.setProcessor(newLaptop.getProcessor());
-        laptopActualizado.setRam(newLaptop.getRam());
-        laptopActualizado.setPrice(newLaptop.getPrice());
-
         _logger.info("Updating laptop with id: " + laptopActualizado.getId());
-        _laptopRepository.save(laptopActualizado);
         return ResponseEntity.ok(laptopActualizado);
     }
 
@@ -107,18 +95,14 @@ public class LaptopController {
      * @param id Long
      * @return ResponseEntity<Laptop>
      */
-    @DeleteMapping("/api/laptops/{id}")
+    @DeleteMapping("/{id}")
+    @Transactional
     @ApiOperation("Elimina un laptop")
     @ApiResponse(code = 204, message = "No Content")
     public ResponseEntity<Laptop> delete(@PathVariable Long id) {
         //Eliminar una laptop
-        Optional<Laptop> optLaptop = _laptopRepository.findById(id);
-        if(optLaptop.isEmpty()) {
-            _logger.warn("Trying to delete a laptop that does not exist");
-            return ResponseEntity.notFound().build();
-        }
         _logger.info("Deleting laptop with id: " + id);
-        _laptopRepository.delete(optLaptop.get());
+        _laptopService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -126,13 +110,14 @@ public class LaptopController {
      * /api/laptops/{id}/delete
      * @return ResponseEntity<Laptop>
      */
-    @DeleteMapping("/api/laptops")
+    @DeleteMapping
+    @Transactional
     @ApiOperation("Elimina todos los laptops")
     @ApiResponse(code = 204, message = "No Content")
     public ResponseEntity<Laptop> deleteAll() {
         //Eliminar todas las laptops
         _logger.info("Deleting all laptops");
-        _laptopRepository.deleteAll();
+        _laptopService.deleteAll();
         return ResponseEntity.noContent().build();
     }
 }

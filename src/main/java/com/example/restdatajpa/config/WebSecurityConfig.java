@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SpringSecurityConfig {
+public class WebSecurityConfig {
     private static final String[] SWAGGER_PATTERNS = {
             "/swagger-resources/**",
             "/v2/api-docs",
@@ -25,14 +24,17 @@ public class SpringSecurityConfig {
     SecurityFilterChain web(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .antMatchers(HttpMethod.GET,"/api/laptops").permitAll()
                         .antMatchers(SWAGGER_PATTERNS).hasRole("ADMIN")
+                        .antMatchers(HttpMethod.GET,"/api/laptops").permitAll()
                         .antMatchers(HttpMethod.GET,"/api/laptops/**").hasRole("USER")
                         .antMatchers(HttpMethod.POST, "/api/laptops").hasRole("ADMIN")
                         .antMatchers(HttpMethod.PUT, "/api/laptops/**").hasRole("ADMIN")
                         .antMatchers(HttpMethod.DELETE, "/api/laptops/**").hasRole("ADMIN")
 			.anyRequest().denyAll()
-		).formLogin().and().csrf().disable();
+		)
+                .httpBasic()
+                .and()
+                .csrf().disable();
         return http.build();
     }
 

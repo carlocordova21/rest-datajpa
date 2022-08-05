@@ -27,6 +27,14 @@ public class Laptop {
     public Laptop() {
     }
 
+    public Laptop(String manufacturer, String model, String processor, Integer ram, Double price) {
+        this.manufacturer = manufacturer;
+        this.model = model;
+        this.processor = processor;
+        this.ram = ram;
+        this.price = price;
+    }
+
     public Laptop(Long id, String manufacturer, String model, String processor, Integer ram, Double price) {
         this.id = id;
         this.manufacturer = manufacturer;
